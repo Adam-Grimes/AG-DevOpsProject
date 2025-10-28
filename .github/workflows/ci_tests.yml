@@ -43,6 +43,6 @@ jobs:
         # Step 4: Run the Test Suite (The Core Check)
         - name: Run test suite
           # Execute the central test runner script 
-          run: python run_tests.py
+          run: python tests/run_tests.py
           # The 'run_tests.py' script is expected to exit with a non-zero code (1) 
           # if any test fails, which will automatically fail this CI job.
