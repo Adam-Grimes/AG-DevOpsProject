@@ -1,27 +1,48 @@
+# --- Workflow Name ---
 name: Python CI Tests
 
+# --- Triggers ---
+# Specifies when this workflow will automatically run
 on:
+    # Run when code is merged or pushed directly to the main branch
     push:
         branches: [ main ]
+    # Run when a Pull Request is opened targeting the main branch
     pull_request:
         branches: [ main ]
 
+# --- Jobs Definition ---
 jobs:
+    # The 'test' job will execute the primary checks
     test:
+        # Specify the operating system environment (runner) to execute the job on
         runs-on: ubuntu-latest
 
+        # Define the sequential steps for the job
         steps:
+        
+        # Step 1: Checkout Repository Code
+        # Uses a GitHub Action to download the project code onto the runner machine
         - uses: actions/checkout@v4
 
+        # Step 2: Set up Python Environment
         - name: Set up Python
           uses: actions/setup-python@v5
           with:
-                python-version: '3.10'
+            # Specify the required Python version for the project
+            python-version: '3.10'
         
+        # Step 3: Install Dependencies
         - name: Install dependencies
           run: |
-                python -m pip install --upgrade pip
-                if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+            # Upgrade pip to ensure the latest package manager is used
+            python -m pip install --upgrade pip
+            # Install any external libraries listed in requirements.txt (if the file exists)
+            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
+        # Step 4: Run the Test Suite (The Core Check)
         - name: Run test suite
+          # Execute the central test runner script 
           run: python run_tests.py
+          # The 'run_tests.py' script is expected to exit with a non-zero code (1) 
+          # if any test fails, which will automatically fail this CI job.
