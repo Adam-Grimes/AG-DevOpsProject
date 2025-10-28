@@ -9,9 +9,9 @@ def run_full_suite():
     loader = unittest.TestLoader()
     
     # 2. Discover all tests
-    # This searches the current directory ('.') for any file 
+    # This searches the current directory ('tests') for any file 
     # that starts with 'test_' and loads all test classes inside.
-    start_dir = '.'
+    start_dir = 'tests'
     suite = loader.discover(start_dir, pattern='test_*.py')
 
     # 3. Create a TestRunner and execute the suite
