@@ -1,27 +1,39 @@
+# this is the name of the action
 name: Python CI Tests
 
+# when to run the action
 on:
-    push:
-        branches: [ main ]
-    pull_request:
-        branches: [ main ]
+  # run on push to main
+  push:
+    branches: [ main ]
+  # run on pull request to main
+  pull_request:
+    branches: [ main ]
 
+# list of jobs to run
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  # the test job
+  test:
+    # what server to use (ubuntu)
+    runs-on: ubuntu-latest
 
-        steps:
-        - uses: actions/checkout@v4
+    # what steps to do
+    steps:
+    # get the code from the repo
+    - uses: actions/checkout@v4
 
-        - name: Set up Python
-          uses: actions/setup-python@v5
-          with:
-                python-version: '3.10'
-        
-        - name: Install dependencies
-          run: |
-                python -m pip install --upgrade pip
-                if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
-        - name: Run test suite
-          run: python run_tests.py
+    # setup python 3.10
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    # install the python packages
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    # run the main test script
+    - name: Run test suite
+      run: python run_tests.py
