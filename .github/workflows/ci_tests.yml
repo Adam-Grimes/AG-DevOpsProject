@@ -20,7 +20,7 @@ jobs:
     # what steps to do
     steps:
     # get the code from the repo
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     # setup python 3.10
     - name: Set up Python
