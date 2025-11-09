@@ -1,6 +1,5 @@
 # AG-DevOpsProject
-#Adam Grimes
-#L00183736
+# Adam Grimes - L00183736
 
 # Python DevOps & CI/CD Pipeline Project
 
@@ -39,11 +38,3 @@ The CI pipeline defined in `.github/workflows/ci_tests.yml` executes the followi
 5.  **Run Test Suite:**
     * Executes the `python run_tests.py` script, which discovers and runs all unit tests.
     * The job will fail if any test fails, preventing bad code from being merged.
-
----
-
-## 👨‍💻 Author
-
-**Adam Grimes**
-* **LinkedIn:** `[Your LinkedIn URL]`
-* **GitHub:** `[Your GitHub URL]`
