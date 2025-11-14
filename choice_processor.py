@@ -1,6 +1,6 @@
 # Function to process user's choice ('x' or 'y')
 def process_choice(choice: str) -> str:
-    
+    """Process the user's choice (x or y) and return a corresponding message."""
     # Make input lowercase (handles 'X' or 'Y')
     cleaned_choice = choice.lower()
 
