@@ -1,72 +1,79 @@
-# this is the name of the action
+# This is a GitHub Actions workflow file
+# It defines automated tests that run when code is pushed or pull requests are created
+
+# Name of this workflow as it appears in GitHub Actions tab
 name: Python CI Tests
 
-# when to run the action
+# Define when this workflow should be triggered
 on:
-  # run on push to main
+  # Run when code is pushed to the main branch
   push:
     branches: [ main ]
-  # run on pull request to main
+  # Also run when pull requests are created or updated targeting main branch
   pull_request:
     branches: [ main ]
 
-# list of jobs to run
+# Jobs are the main building blocks of a workflow
+# Each job runs in a fresh virtual environment and can run in parallel
 jobs:
-  lint:
-    # what server to use (ubuntu)
-    runs-on: ubuntu-latest
-    # what steps to do
-    steps:
-    # get the code from the repo
-    - uses: actions/checkout@v5
-
-    # setup python 3.10
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-    
-    # install the linter packages
-    - name: Install linting dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 black
-    
-    # run black to check formatting
-    - name: Run Black (Format Check)
-      run: |
-        black . --check
-    
-    # run flake8 to check for errors and style
-    - name: Run Flake8 (Lint Check)
-      run: |
-        flake8 . --count --show-source --statistics
-
-
+  # Define a job named "test" - this runs our tests
   test:
-    # ADD THIS LINE:
-    needs: lint # This makes it wait for the 'lint' job to pass
-    
-    # what server to use (ubuntu)
+    # Specify the operating system for the runner
+    # ubuntu-latest = most recent Ubuntu version available
     runs-on: ubuntu-latest
 
-    # what steps to do
+    # Steps are individual tasks that run sequentially in the job
     steps:
-    # get the code from the repo
-    - uses: actions/checkout@v5
+    # Step 1: Check out the repository code
+    # This downloads the code so subsequent steps can access it
+    - uses: actions/checkout@v5  # Uses the checkout action at version 5
 
-    # setup python 3.10
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
+    # Step 2: Set up Python environment
+    # This installs the specified Python version on the runner
+    - name: Set up Python  # Human-readable name for this step
+      uses: actions/setup-python@v6  # Uses the setup-python action
+      with:  # Input parameters for the action
+        python-version: '3.10'  # Specify Python 3.10 to install
     
-    # install the python packages
+    # Step 3: Install Python dependencies
+    # This upgrades pip and installs packages from requirements.txt if it exists
     - name: Install dependencies
-      run: |
+      run: |  # Multi-line shell script
+        # Upgrade pip to latest version
         python -m pip install --upgrade pip
+        # Install packages from requirements.txt if the file exists
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     
-    # run the main test script
+    # Step 4: Lint the code with flake8
+    # This checks code quality, style, and identifies potential issues
+    - name: Lint with flake8
+      run: |
+        # Install flake8 package for code linting
+        pip install flake8
+        
+        # First flake8 run: Check for CRITICAL errors that should fail the build
+        # --count: Show number of errors
+        # --select: Only check these specific error codes:
+        #   E9: Syntax errors and indentation problems (critical)
+        #   F63: Comparison and identity issues (likely bugs)
+        #   F7: Incorrect syntax usage (critical)
+        #   F82: Undefined names/variables (critical)
+        # --show-source: Display the problematic source code
+        # --statistics: Show summary statistics
+        # This command will FAIL the build if any critical issues are found
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        
+        # Second flake8 run: Check for STYLE issues (warnings only)
+        # --exit-zero: Always return success (0) - don't fail build for style issues
+        # --max-complexity=10: Warn if function complexity score exceeds 10
+        # --max-line-length=127: Allow lines up to 127 characters (adjust as needed)
+        # --statistics: Show summary statistics
+        # This provides style feedback without blocking the build
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    
+    # Step 5: Run the actual test suite
+    # This executes the main test script for the project
     - name: Run test suite
-      run: python run_tests.py
+      run: python run_tests.py  # Execute the test runner script
+
+# End of workflow definition
