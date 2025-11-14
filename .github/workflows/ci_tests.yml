@@ -1,8 +1,8 @@
 # This is a GitHub Actions workflow file
-# It defines automated tests that run when code is pushed or pull requests are created
+# It defines automated tests and documentation deployment
 
 # Name of this workflow as it appears in GitHub Actions tab
-name: Python CI Tests
+name: Python CI, Tests, and Docs
 
 # Define when this workflow should be triggered
 on:
@@ -14,66 +14,108 @@ on:
     branches: [ main ]
 
 # Jobs are the main building blocks of a workflow
-# Each job runs in a fresh virtual environment and can run in parallel
+# Each job runs in a fresh virtual environment
 jobs:
-  # Define a job named "test" - this runs our tests
+  # Job 1: Run linter and test suite
   test:
     # Specify the operating system for the runner
-    # ubuntu-latest = most recent Ubuntu version available
     runs-on: ubuntu-latest
 
     # Steps are individual tasks that run sequentially in the job
     steps:
     # Step 1: Check out the repository code
-    # This downloads the code so subsequent steps can access it
-    - uses: actions/checkout@v5  # Uses the checkout action at version 5
+    - name: Checkout code
+      uses: actions/checkout@v5
 
     # Step 2: Set up Python environment
-    # This installs the specified Python version on the runner
-    - name: Set up Python  # Human-readable name for this step
-      uses: actions/setup-python@v6  # Uses the setup-python action
-      with:  # Input parameters for the action
-        python-version: '3.10'  # Specify Python 3.10 to install
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.10'
     
     # Step 3: Install Python dependencies
-    # This upgrades pip and installs packages from requirements.txt if it exists
     - name: Install dependencies
-      run: |  # Multi-line shell script
-        # Upgrade pip to latest version
+      run: |
         python -m pip install --upgrade pip
-        # Install packages from requirements.txt if the file exists
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     
     # Step 4: Lint the code with flake8
-    # This checks code quality, style, and identifies potential issues
     - name: Lint with flake8
       run: |
-        # Install flake8 package for code linting
         pip install flake8
-        
-        # First flake8 run: Check for CRITICAL errors that should fail the build
-        # --count: Show number of errors
-        # --select: Only check these specific error codes:
-        #   E9: Syntax errors and indentation problems (critical)
-        #   F63: Comparison and identity issues (likely bugs)
-        #   F7: Incorrect syntax usage (critical)
-        #   F82: Undefined names/variables (critical)
-        # --show-source: Display the problematic source code
-        # --statistics: Show summary statistics
-        # This command will FAIL the build if any critical issues are found
+        # Critical error check
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        
-        # Second flake8 run: Check for STYLE issues (warnings only)
-        # --exit-zero: Always return success (0) - don't fail build for style issues
-        # --max-complexity=10: Warn if function complexity score exceeds 10
-        # --max-line-length=127: Allow lines up to 127 characters (adjust as needed)
-        # --statistics: Show summary statistics
-        # This provides style feedback without blocking the build
+        # Style check (non-blocking)
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
     # Step 5: Run the actual test suite
-    # This executes the main test script for the project
     - name: Run test suite
-      run: python run_tests.py  # Execute the test runner script
+      run: python run_tests.py
 
-# End of workflow definition
+  # Job 2: Build and deploy documentation
+  build-and-deploy-docs:
+    # This job runs only after the 'test' job has successfully completed
+    needs: test
+    
+    # This job only runs on a push to the 'main' branch
+    # We don't want to deploy docs from Pull Requests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    # Specify the runner
+    runs-on: ubuntu-latest
+
+    # Grant permissions for GitHub Pages deployment
+    permissions:
+      contents: read
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment source
+
+    # Specify the deployment environment for GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+
+      # Step 3: Generate documentation with pydoc
+      # pydoc is a built-in Python module, so no installation is needed.
+      - name: Generate documentation
+        run: |
+          # Create the output directory
+          mkdir -p ./docs
+          
+          # Generate documentation for each module.
+          # pydoc -w <module_name> writes <module_name>.html to the current directory
+          python -m pydoc -w choice_processor
+          python -m pydoc -w combat
+          
+          # Move the generated HTML files into the docs directory
+          # We also create a simple index.html to link to the module pages,
+          # as GitHub Pages needs an index file.
+          mv choice_processor.html combat.html ./docs/
+          echo "<h1>Project Documentation</h1><ul><li><a href='choice_processor.html'>choice_processor</a></li><li><a href='combat.html'>combat</a></li></ul>" > ./docs/index.html
+
+      # Step 5: Configure GitHub Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      # Step 6: Upload documentation artifact
+      # This packages the ./docs directory for deployment
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs'
+
+      # Step 7: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
