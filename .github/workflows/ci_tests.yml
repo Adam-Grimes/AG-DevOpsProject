@@ -52,6 +52,10 @@ jobs:
     - name: Run test suite
       run: python run_tests.py
 
+    # Step 6: Run health check
+    - name: Run health check
+      run: python health_check.py
+
   # Job 2: Build and deploy documentation
   build-and-deploy-docs:
     # This job runs only after the 'test' job has successfully completed
