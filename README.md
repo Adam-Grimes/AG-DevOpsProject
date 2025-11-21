@@ -5,36 +5,50 @@
 
 This project demonstrates a complete DevOps workflow for a Python application. While the Python code itself is simple (a basic combat calculator and choice processor), the focus of this repository is the robust **Continuous Integration (CI), automated testing, and security infrastructure** built around it.
 
-It is designed to showcase best practices in modern software development, automation, and repository management.
+It is designed to showcase best practices in modern software development, automation, and repository management, aligning with Agile and DevOps principles.
 
-[![Python CI Tests](https://github.com/Adam-Grimes/AG-DevOpsProject/actions/workflows/ci_tests.yml/badge.svg)](https://github.com/Adam-Grimes/AG-DevOpsProject/actions/workflows/ci_tests.yml)
+[![Python CI, Tests, and Docs](https://github.com/Adam-Grimes/AG-DevOpsProject/actions/workflows/ci_tests.yml/badge.svg)](https://github.com/Adam-Grimes/AG-DevOpsProject/actions/workflows/ci_tests.yml)
 
 ---
 
 ## 🚀 Key Features
 
-* **Continuous Integration Pipeline:** A full CI workflow using **GitHub Actions** that automatically builds and tests the project on every `push` and `pull_request` to the `main` branch.
-* **Automated Unit Testing:** The pipeline automatically runs a full suite of unit tests. The project uses Python's built-in `unittest` framework.
-* **Scalable Test Runner:** A custom `run_tests.py` script uses `unittest.TestLoader().discover` to find all files matching `test_*.py`. This means new tests are automatically included in the CI run, making the suite scalable.
-* **CI-Friendly Exit Codes:** The test runner script properly reports failure to the CI system by using `sys.exit(1)`, ensuring the pipeline fails if any test fails.
-* **Automated Dependency Management:** The repository uses **Dependabot** to automatically scan for outdated dependencies and create pull requests to update them, enhancing project security.
-* **Code Quality & Documentation:** The pipeline is configured to run **linters** (like Flake8) to enforce code style and **auto-documentation tools** (like Sphinx) to keep documentation up-to-date.
-* **Professional Repository Standards:** Includes standard community health files such as `LICENSE`, `CODE_OF_CONDUCT.md`, and a `SECURITY.md` with vulnerability reporting guidelines.
+### 🛠️ Automation & CI/CD
+* **Continuous Integration:** A GitHub Actions workflow (`ci_tests.yml`) automatically builds and tests the project on every `push` and `pull_request` to `main`.
+* **Continuous Deployment (CD):** The pipeline automatically builds HTML documentation and deploys it to **GitHub Pages**, ensuring documentation is always live and up-to-date.
+* **Automated Dependency Management:** **Dependabot** is configured to scan for outdated dependencies and automatically open Pull Requests to update them.
+
+### 🧪 Testing & Quality
+* **Automated Unit Testing:** The pipeline runs a full suite of tests using Python's `unittest` framework.
+* **Scalable Test Runner:** A custom `run_tests.py` script uses `unittest.TestLoader().discover` to find all files matching `test_*.py`. This ensures new tests are automatically registered without manual intervention.
+* **Code Quality Analysis:** The pipeline integrates **Flake8** to enforce PEP 8 style guides and linting standards before any code is merged.
+
+### 🔍 Observability (Logging & Monitoring)
+* **Structured Logging:** The application (`combat.py`, `choice_processor.py`) implements Python's `logging` module to generate timestamped, informative logs (`app.log`) for traceability.
+* **Automated Health Checks:** The CI pipeline includes a `health_check.py` script that verifies module availability and system stability post-testing.
+* **Visual Monitoring:** A live **Workflow Status Badge** provides immediate feedback on pipeline health directly from the README.
+
+### 📚 Documentation
+* **Auto-Generated Documentation:** The project uses **pydoc** (Python's built-in documentation generator) to automatically create HTML documentation from code docstrings during the CI process.
 
 ---
 
-## 🔁 CI Pipeline Workflow
+## 🔁 CI/CD Pipeline Workflow
 
-The CI pipeline defined in `.github/workflows/ci_tests.yml` executes the following steps on an `ubuntu-latest` runner:
+The pipeline defined in `.github/workflows/ci_tests.yml` executes the following steps on an `ubuntu-latest` runner:
 
-1.  **Checkout Code:** `uses: actions/checkout@v5`
-    * Securely checks out the repository's source code.
-2.  **Set up Python:** `uses: actions/setup-python@v6`
-    * Sets up a specific Python version (e.g., `3.10`) for a consistent test environment.
-3.  **Install Dependencies:**
-    * Upgrades `pip` and installs all required packages from `requirements.txt`.
-4.  **Run Linters & Doc Generators:**
-    * *(This step runs tools like Flake8 to check code style and Sphinx to build documentation).*
-5.  **Run Test Suite:**
-    * Executes the `python run_tests.py` script, which discovers and runs all unit tests.
-    * The job will fail if any test fails, preventing bad code from being merged.
+1.  **Checkout Code:** Checks out the repository securely.
+2.  **Environment Setup:** Sets up Python 3.10 for a consistent runtime.
+3.  **Install Dependencies:** Installs `flake8` and other requirements.
+4.  **Linting:** Runs `flake8` to check for syntax errors and style violations.
+5.  **Test Suite:** Executes `python run_tests.py` to run all unit tests. The job fails immediately if any test fails.
+6.  **Health Check (Monitoring):** Runs `python health_check.py` to verify that the application modules load correctly in the production-like environment.
+7.  **Documentation Build:** Uses `pydoc` to generate HTML files for `choice_processor` and `combat`.
+8.  **Deploy:** Uploads the generated HTML artifacts to **GitHub Pages**.
+
+---
+
+## 🛡️ Security & Compliance
+* **Vulnerability Reporting:** Security policy defined in `SECURITY.md`.
+* **Community Standards:** Expected behavior outlined in `CODE_OF_CONDUCT.md`.
+* **Licensing:** Open source distribution under the Apache 2.0 `LICENSE`.
