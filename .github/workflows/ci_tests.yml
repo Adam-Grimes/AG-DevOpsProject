@@ -56,6 +56,18 @@ jobs:
     - name: Run health check
       run: python health_check.py
 
+  docker-build:
+    # Build runs only if tests pass
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Build Docker image
+        # Builds the image to ensure the Dockerfile is valid
+        run: docker build . --file Dockerfile --tag my-app:$(date +%s)
+
   # Job 2: Build and deploy documentation
   build-and-deploy-docs:
     # This job runs only after the 'test' job has successfully completed
