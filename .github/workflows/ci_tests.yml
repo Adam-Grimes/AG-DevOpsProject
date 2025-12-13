@@ -121,7 +121,8 @@ jobs:
           # Create a simple index.html to link to the module pages,
           # as GitHub Pages needs an index file.
           mv choice_processor.html combat.html ./docs/
-          echo "<h1>Project Documentation</h1><ul><li><a href='choice_processor.html'>choice_processor</a></li><li><a href='combat.html'>combat</a></li></ul>" > ./docs/index.html
+          echo "mv choice_processor.html combat.html test_choice_processor.html test_combat.html ./docs/
+          echo "<h1>Project Documentation</h1><ul><li><a href='choice_processor.html'>choice_processor</a></li><li><a href='combat.html'>combat</a></li><li><a href='test_choice_processor.html'>test_choice_processor</a></li><li><a href='test_combat.html'>test_combat</a></li></ul>" > ./docs/index.html
 
       # Step 5: Configure GitHub Pages
       - name: Setup Pages
