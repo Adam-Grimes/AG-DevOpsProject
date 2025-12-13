@@ -74,7 +74,7 @@ jobs:
     needs: test
     
     # This job only runs on a push to the 'main' branch
-    # We don't want to deploy docs from Pull Requests
+    # Don't want to deploy docs from Pull Requests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     # Specify the runner
@@ -113,9 +113,12 @@ jobs:
           # pydoc -w <module_name> writes <module_name>.html to the current directory
           python -m pydoc -w choice_processor
           python -m pydoc -w combat
+          python -m pydoc -w test_choice_processor
+          python -m pydoc -w test_combat
+
           
           # Move the generated HTML files into the docs directory
-          # We also create a simple index.html to link to the module pages,
+          # Create a simple index.html to link to the module pages,
           # as GitHub Pages needs an index file.
           mv choice_processor.html combat.html ./docs/
           echo "<h1>Project Documentation</h1><ul><li><a href='choice_processor.html'>choice_processor</a></li><li><a href='combat.html'>combat</a></li></ul>" > ./docs/index.html
