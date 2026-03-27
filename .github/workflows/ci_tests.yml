@@ -132,7 +132,7 @@ jobs:
           EOF
           
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       # Step 6: Upload documentation artifact
       # This packages the ./docs directory for deployment
